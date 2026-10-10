@@ -33,7 +33,7 @@
   /* Maçonnerie : 3 colonnes, chaque carte garde son format */
   .galerie { display: flex; gap: var(--marge); align-items: flex-start; }
   .colonne { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: var(--marge); }
-  .carte { display: block; width: 100%; margin: 0; padding: 0; border: 0; border-radius: 10px;
+  .carte { display: block; width: 100%; margin: 0; padding: 0; border: 0; border-radius: 5px;
            overflow: hidden; background: var(--gris); cursor: zoom-in; break-inside: avoid; }
   .carte img { display: block; width: 100%; height: auto; }
   .carte { position: relative; }
@@ -41,9 +41,10 @@
   .carte::after { content: ""; position: absolute; inset: 0; background: #222F26; opacity: 0;
                 transition: opacity .3s ease; pointer-events: none; z-index: 1; }
   .carte .titre { position: absolute; left: 0; right: 0; bottom: 0; z-index: 2; padding: 20px;
-                text-align: left; font-size: 1.1rem; font-weight: 600; color: #F5F5F5;
+                text-align: left; font-size: 1.2rem; color: #F5F5F5;
+                font-family: "Bricolage Grotesque", system-ui, sans-serif; font-weight: 600;
                 opacity: 0; transform: translateY(8px); transition: opacity .3s ease, transform .3s ease; }
-  .carte:hover img, .carte:focus-visible img { transform: scale(1.03); }
+  .carte:hover img, .carte:focus-visible img { transform: scale(1.01); }
   .carte:hover::after, .carte:focus-visible::after { opacity: .5; }
   .carte:hover .titre, .carte:focus-visible .titre { opacity: 1; transform: translateY(0); }
   .carte .vide { aspect-ratio: 4 / 3; display: grid; place-items: center; color: #555; font-size: .9rem; }
