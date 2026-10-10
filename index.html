@@ -97,7 +97,9 @@ function creerCarte(c, img) {
   b.append(img);
   b.onclick = () => {
     const z = document.getElementById("zoom-img");
-    z.src = c.image; z.alt = c.titre; zoom.showModal();
+    z.src = c.image;
+    z.alt = c.titre;
+    zoom.showModal();
   };
   return b;
 }
@@ -109,7 +111,8 @@ function charger(c) {
     img.onload = () => resolve({ c, img, ratio: img.naturalHeight / img.naturalWidth });
     img.onerror = () => {
       const v = document.createElement("div");
-      v.className = "vide"; v.textContent = c.image;
+      v.className = "vide";
+      v.textContent = c.image;
       resolve({ c, img: v, ratio: 0.75 });
     };
     img.src = c.image;
@@ -117,29 +120,39 @@ function charger(c) {
 }
 
 let chargees = [];
+
 function disposer() {
   galerie.innerHTML = "";
   const n = nbColonnes();
-  const cols = Array.from({ length: n }, () => {
+  const cols = [];
+  for (let i = 0; i < n; i++) {
     const d = document.createElement("div");
     d.className = "colonne";
     galerie.append(d);
-    return d;
-  });
-  const hauteurs = Array(n).fill(0);
-  chargees.forEach(({ c, img, ratio }) => {
+    cols.push(d);
+  }
+  const hauteurs = new Array(n).fill(0);
+  chargees.forEach(item => {
     const i = hauteurs.indexOf(Math.min(...hauteurs));
-    cols[i].append(creerCarte(c, img));
-    hauteurs[i] += ratio;
+    cols[i].append(creerCarte(item.c, item.img));
+    hauteurs[i] += item.ratio;
   });
 }
 
-Promise.all(CARTES.map(charger)).then(r => { chargees = r; disposer(); });
+Promise.all(CARTES.map(charger)).then(resultats => {
+  chargees = resultats;
+  disposer();
+});
 
-let n0 = nbColonnes();
+let colonnesActuelles = nbColonnes();
 window.addEventListener("resize", () => {
-  if (nbColonnes() !== n0) { n0 = nbColonnes(); disposer(); }
-}); = () => zoom.close();
+  if (nbColonnes() !== colonnesActuelles) {
+    colonnesActuelles = nbColonnes();
+    disposer();
+  }
+});
+
+document.getElementById("fermer").onclick = () => zoom.close();
 zoom.addEventListener("click", e => { if (e.target === zoom) zoom.close(); });
 </script>
 </body>
