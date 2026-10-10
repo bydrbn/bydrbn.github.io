@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>bydrbn</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,600;12..96,800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --fond: #222F26;        /* fond uni de la page */
+    --texte: #8BAE9A;       /* couleur du logo et du texte */
+    --gris: #A9A9A9;        /* gris des cartes vides */
+    --marge: 50px;          /* marges gauche/droite et espace entre les cartes */
+    --taille-logo: 48px;    /* taille du logo « bydrbn » (modifie ici) */
+    --hauteur-fond: 1100px; /* hauteur sur laquelle l'image de fond s'estompe */
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; position: relative; background: var(--fond); color: var(--texte);
+         font-family: "Bricolage Grotesque", system-ui, sans-serif; }
+
+  /* Image de fond : dégradé vertical, puis fond uni en descendant */
+  .fond { position: absolute; inset: 0 0 auto 0; height: var(--hauteur-fond); z-index: 0;
+          background:
+            linear-gradient(to bottom, rgba(34,47,38,.35) 0%, rgba(34,47,38,.75) 55%, var(--fond) 100%),
+            url("fond.jpg") center top / cover no-repeat; }
+  .page { position: relative; z-index: 1; padding: 0 var(--marge) var(--marge); }
+
+  .logo { margin: 0; padding-top: 40px; font-size: var(--taille-logo); font-weight: 800; line-height: 1; letter-spacing: -.01em; }
+  .intro { max-width: 40ch; margin: 80px auto 90px; text-align: center; font-size: clamp(1.6rem, 3vw, 2.6rem); font-weight: 600; line-height: 1.2; }
+
+  /* Maçonnerie : 3 colonnes, chaque carte garde son format */
+  .galerie { columns: 3; column-gap: var(--marge); }
+  .carte { display: block; width: 100%; margin: 0 0 var(--marge); padding: 0; border: 0; border-radius: 20px;
+           overflow: hidden; background: var(--gris); cursor: zoom-in; break-inside: avoid; }
+  .carte img { display: block; width: 100%; height: auto; }
+  .carte .vide { aspect-ratio: 4 / 3; display: grid; place-items: center; color: #555; font-size: .9rem; }
+  .carte:focus-visible, .fermer:focus-visible { outline: 3px solid var(--texte); outline-offset: 3px; }
+
+  @media (max-width: 900px) { :root { --marge: 30px; } .galerie { columns: 2; } }
+  @media (max-width: 560px) { :root { --marge: 20px; } .galerie { columns: 1; } .intro { margin: 50px auto 50px; } }
+
+  /* Carte en grand */
+  dialog { max-width: 96vw; max-height: 96vh; padding: 0; border: 0; background: transparent; }
+  dialog::backdrop { background: rgba(20, 28, 23, .92); }
+  dialog img { display: block; max-width: 94vw; max-height: 90vh; margin: auto; border-radius: 12px; }
+  .fermer { position: fixed; top: 16px; right: 20px; font: inherit; font-weight: 600; padding: 8px 18px;
+            border: 0; border-radius: 999px; background: var(--texte); color: var(--fond); cursor: pointer; }
+</style>
+</head>
+<body>
+<div class="fond"></div>
+
+<div class="page">
+  <h1 class="logo">bydrbn</h1>
+
+  <!-- À MODIFIER : ton texte de présentation -->
+  <p class="intro">Un texte que je définirai plus tard.</p>
+
+  <main class="galerie" id="galerie"></main>
+</div>
+
+<dialog id="zoom">
+  <button class="fermer" id="fermer">Fermer</button>
+  <img id="zoom-img" alt="">
+</dialog>
+
+<script>
+/* ============================================================
+   TES CARTES : une ligne par carte.
+   - image : chemin du fichier dans le dossier "cartes"
+   - titre : sert de description de l'image (accessibilité)
+   Pour ajouter une carte, copie une ligne et modifie-la.
+   ============================================================ */
+const CARTES = [
+  { image: "cartes/exemple-1.jpg", titre: "Titre de la carte 1" },
+  { image: "cartes/exemple-2.jpg", titre: "Titre de la carte 2" },
+  { image: "cartes/exemple-3.jpg", titre: "Titre de la carte 3" },
+];
+
+const galerie = document.getElementById("galerie");
+const zoom = document.getElementById("zoom");
+
+CARTES.forEach(c => {
+  const b = document.createElement("button");
+  b.className = "carte";
+  b.setAttribute("aria-label", "Agrandir : " + c.titre);
+  const img = new Image();
+  img.src = c.image; img.alt = c.titre; img.loading = "lazy";
+  img.onerror = () => { const v = document.createElement("div"); v.className = "vide"; v.textContent = c.image; img.replaceWith(v); };
+  b.append(img);
+  b.onclick = () => {
+    const z = document.getElementById("zoom-img");
+    z.src = c.image; z.alt = c.titre; zoom.showModal();
+  };
+  galerie.append(b);
+});
+
+document.getElementById("fermer").onclick = () => zoom.close();
+zoom.addEventListener("click", e => { if (e.target === zoom) zoom.close(); });
+</script>
+</body>
+</html>
