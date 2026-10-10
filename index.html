@@ -12,7 +12,7 @@
     --fond: #222F26;        /* fond uni de la page */
     --texte: #8BAE9A;       /* couleur du logo et du texte */
     --gris: #A9A9A9;        /* gris des cartes vides */
-    --marge: 50px;          /* marges gauche/droite et espace entre les cartes */
+    --marge: 40px;          /* marges gauche/droite et espace entre les cartes */
     --taille-logo: 36px;    /* taille du logo « bydrbn » (modifie ici) */
     --hauteur-fond: 1100px; /* hauteur sur laquelle l'image de fond s'estompe */
   }
@@ -41,9 +41,9 @@
   .carte::after { content: ""; position: absolute; inset: 0; background: #222F26; opacity: 0;
                 transition: opacity .3s ease; pointer-events: none; z-index: 1; }
   .carte .titre { position: absolute; left: 0; right: 0; bottom: 0; z-index: 2; padding: 20px;
-                text-align: left; font-size: 1.2rem; font-weight: 600; color: #F5F5F5;
+                text-align: left; font-size: 1.1rem; font-weight: 600; color: #F5F5F5;
                 opacity: 0; transform: translateY(8px); transition: opacity .3s ease, transform .3s ease; }
-  .carte:hover img, .carte:focus-visible img { transform: scale(1.05); }
+  .carte:hover img, .carte:focus-visible img { transform: scale(1.03); }
   .carte:hover::after, .carte:focus-visible::after { opacity: .5; }
   .carte:hover .titre, .carte:focus-visible .titre { opacity: 1; transform: translateY(0); }
   .carte .vide { aspect-ratio: 4 / 3; display: grid; place-items: center; color: #555; font-size: .9rem; }
@@ -101,7 +101,7 @@ const galerie = document.getElementById("galerie");
 const zoom = document.getElementById("zoom");
 
 function nbColonnes() {
-  return window.innerWidth <= 560 ? 1 : window.innerWidth <= 900 ? 2 : 3;
+  return window.innerWidth <= 560 ? 1 : window.innerWidth <= 900 ? 2 : 4;
 }
 
 function creerCarte(c, img) {
