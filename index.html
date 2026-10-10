@@ -36,6 +36,16 @@
   .carte { display: block; width: 100%; margin: 0; padding: 0; border: 0; border-radius: 10px;
            overflow: hidden; background: var(--gris); cursor: zoom-in; break-inside: avoid; }
   .carte img { display: block; width: 100%; height: auto; }
+  .carte { position: relative; }
+  .carte img { transition: transform .4s ease; }
+  .carte::after { content: ""; position: absolute; inset: 0; background: #222F26; opacity: 0;
+                transition: opacity .3s ease; pointer-events: none; z-index: 1; }
+  .carte .titre { position: absolute; left: 0; right: 0; bottom: 0; z-index: 2; padding: 20px;
+                text-align: left; font-size: 1.2rem; font-weight: 600; color: #F5F5F5;
+                opacity: 0; transform: translateY(8px); transition: opacity .3s ease, transform .3s ease; }
+  .carte:hover img, .carte:focus-visible img { transform: scale(1.05); }
+  .carte:hover::after, .carte:focus-visible::after { opacity: .5; }
+  .carte:hover .titre, .carte:focus-visible .titre { opacity: 1; transform: translateY(0); }
   .carte .vide { aspect-ratio: 4 / 3; display: grid; place-items: center; color: #555; font-size: .9rem; }
   .carte:focus-visible, .fermer:focus-visible { outline: 3px solid var(--texte); outline-offset: 3px; }
 
@@ -98,7 +108,10 @@ function creerCarte(c, img) {
   const b = document.createElement("button");
   b.className = "carte";
   b.setAttribute("aria-label", "Agrandir : " + c.titre);
-  b.append(img);
+  const t = document.createElement("span");
+  t.className = "titre";
+  t.textContent = c.titre;
+  b.append(img, t);
   b.onclick = () => {
     const z = document.getElementById("zoom-img");
     z.src = c.image;
