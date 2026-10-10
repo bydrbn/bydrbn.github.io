@@ -31,15 +31,16 @@
   .intro { max-width: 40ch; margin: 80px auto 90px; text-align: center; font-size: clamp(1.6rem, 3vw, 2.6rem); font-weight: 600; line-height: 1.2; }
 
   /* Maçonnerie : 3 colonnes, chaque carte garde son format */
-  .galerie { columns: 3; column-gap: var(--marge); }
-  .carte { display: block; width: 100%; margin: 0 0 var(--marge); padding: 0; border: 0; border-radius: 10px;
+  .galerie { display: flex; gap: var(--marge); align-items: flex-start; }
+  .colonne { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: var(--marge); }
+  .carte { display: block; width: 100%; margin: 0; padding: 0; border: 0; border-radius: 10px;
            overflow: hidden; background: var(--gris); cursor: zoom-in; break-inside: avoid; }
   .carte img { display: block; width: 100%; height: auto; }
   .carte .vide { aspect-ratio: 4 / 3; display: grid; place-items: center; color: #555; font-size: .9rem; }
   .carte:focus-visible, .fermer:focus-visible { outline: 3px solid var(--texte); outline-offset: 3px; }
 
-  @media (max-width: 900px) { :root { --marge: 30px; } .galerie { columns: 2; } }
-  @media (max-width: 560px) { :root { --marge: 20px; } .galerie { columns: 1; } .intro { margin: 50px auto 50px; } }
+  @media (max-width: 900px) { :root { --marge: 30px; } }
+  @media (max-width: 560px) { :root { --marge: 20px; } .intro { margin: 50px auto 50px; } }
 
   /* Carte en grand */
   dialog { max-width: 96vw; max-height: 96vh; padding: 0; border: 0; background: transparent; }
@@ -56,8 +57,8 @@
   <h1 class="logo">bydrbn</h1>
 
   <!-- À MODIFIER : ton texte de présentation -->
-  <p class="intro">Un texte que je définirai plus tard.</p>
-
+<p class="intro" style="visibility:hidden">Un texte que je définirai plus tard.</p>
+  
   <main class="galerie" id="galerie"></main>
 </div>
 
@@ -85,22 +86,60 @@ const CARTES = [
 const galerie = document.getElementById("galerie");
 const zoom = document.getElementById("zoom");
 
-CARTES.forEach(c => {
+function nbColonnes() {
+  return window.innerWidth <= 560 ? 1 : window.innerWidth <= 900 ? 2 : 3;
+}
+
+function creerCarte(c, img) {
   const b = document.createElement("button");
   b.className = "carte";
   b.setAttribute("aria-label", "Agrandir : " + c.titre);
-  const img = new Image();
-  img.src = c.image; img.alt = c.titre; img.loading = "lazy";
-  img.onerror = () => { const v = document.createElement("div"); v.className = "vide"; v.textContent = c.image; img.replaceWith(v); };
   b.append(img);
   b.onclick = () => {
     const z = document.getElementById("zoom-img");
     z.src = c.image; z.alt = c.titre; zoom.showModal();
   };
-  galerie.append(b);
-});
+  return b;
+}
 
-document.getElementById("fermer").onclick = () => zoom.close();
+function charger(c) {
+  return new Promise(resolve => {
+    const img = new Image();
+    img.alt = c.titre;
+    img.onload = () => resolve({ c, img, ratio: img.naturalHeight / img.naturalWidth });
+    img.onerror = () => {
+      const v = document.createElement("div");
+      v.className = "vide"; v.textContent = c.image;
+      resolve({ c, img: v, ratio: 0.75 });
+    };
+    img.src = c.image;
+  });
+}
+
+let chargees = [];
+function disposer() {
+  galerie.innerHTML = "";
+  const n = nbColonnes();
+  const cols = Array.from({ length: n }, () => {
+    const d = document.createElement("div");
+    d.className = "colonne";
+    galerie.append(d);
+    return d;
+  });
+  const hauteurs = Array(n).fill(0);
+  chargees.forEach(({ c, img, ratio }) => {
+    const i = hauteurs.indexOf(Math.min(...hauteurs));
+    cols[i].append(creerCarte(c, img));
+    hauteurs[i] += ratio;
+  });
+}
+
+Promise.all(CARTES.map(charger)).then(r => { chargees = r; disposer(); });
+
+let n0 = nbColonnes();
+window.addEventListener("resize", () => {
+  if (nbColonnes() !== n0) { n0 = nbColonnes(); disposer(); }
+}); = () => zoom.close();
 zoom.addEventListener("click", e => { if (e.target === zoom) zoom.close(); });
 </script>
 </body>
